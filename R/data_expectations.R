@@ -60,6 +60,7 @@ expect_no_duplicates <- function(df, group_by_column, stop_if_surprise = TRUE, r
   }
 }
 
+
 #' Check if a dataframe has the same number of rows as another, or else 0 rows. If vectors are given the lengths of the vectors are compared.
 #'
 #' @param df1 dataframe or vector to check (required)
@@ -113,11 +114,25 @@ expect_same_number_of_rows <- function(df1, df2 = data.frame(), stop_if_surprise
   }
 }
 
+#' Check if the column names you expect to be in the df, are indeed in there
+#'
+#' @param df
+#' @param colums_expected a character vector
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' expect_column_names_somewhere_in_data_frame(mtcars, c("mpg", "cyl"))
+#' # [1] "all columns found...OK"
+#' expect_column_names_somewhere_in_data_frame(mtcars, c("mpg", "cyl", "car_name"))
+#' # Error in expect_column_names_somewhere_in_data_frame(mtcars, c("mpg",  :
+#' #   car_name column not found
 expect_column_names_somewhere_in_data_frame <- function(df, colums_expected){
-  if(sum(names(mi_trueup) %in% colums_expected) == length(colums_expected)){
+  if(sum(names(df) %in% colums_expected) == length(colums_expected)){
     print("all columns found...OK")
   } else{
-    cols_not_found <- colums_expected[!(colums_expected %in% names(mi_trueup))]
+    cols_not_found <- colums_expected[!(colums_expected %in% names(df))]
     stop(paste0(paste0(cols_not_found, collapse = ", "), " column",
                 ifelse(length(cols_not_found) > 1, "s", ""),
                 " not found"))
@@ -125,6 +140,20 @@ expect_column_names_somewhere_in_data_frame <- function(df, colums_expected){
 }
 
 
+#' Check that values in a discrete or categorical vector are within a set of acceptable values
+#'
+#' @param test_vector vector to test
+#' @param correct_vector vector of all acceptable values
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' expect_values_only_in(mtcars$cyl, c(2, 4, 6))
+#' # Error in expect_values_only_in(mtcars$cyl, c(2, 4, 6)) :
+#' #   8 value not found in list given
+#' expect_values_only_in(mtcars$cyl, c(2, 4, 6, 8))
+#' # [1] "all values expected...OK"
 expect_values_only_in <- function(test_vector, correct_vector){
   if(typeof(test_vector) != typeof(correct_vector) |
      class(test_vector) != class(correct_vector)){
@@ -141,6 +170,26 @@ expect_values_only_in <- function(test_vector, correct_vector){
   }
 }
 
+
+#' Check if there are any NA values in a data frame, or specified column, withon a tolerance
+#'
+#' @param df
+#' @param test_column character string for column to test - optional
+#' @param na_tolerance number of NA allowed before failure, default is zero
+#'
+#' @return
+#' @export
+#' @importFrom dplyr select_
+#'
+#' @examples
+#' expect_no_nas(mtcars, "cyl")
+#' # [1] "Detected 0 NAs...OK"
+#' expect_no_nas(mtcars)
+#' # [1] "Detected 0 NAs...OK"
+#' expect_no_nas(c(0, 3, 4, 5))
+#' # [1] "Detected 0 NAs...OK"
+#' expect_no_nas(c(0, 3, NA, 5))
+#' # Error in expect_no_nas(c(0, 3, NA, 5)) : Detected 1 NAs
 expect_no_nas <- function(df, test_column = NA, na_tolerance = 0){
   if(!is.na(test_column)){
     # -i to handle multiple columns, need to iterate, maybe create or find a function that will make mult names

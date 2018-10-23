@@ -23,6 +23,18 @@ several options depending on whether it fails or succeeeds
 Check if a data frame has duplicates in a given column. If a vector is given, check for duplicates in the vector.
 }
 \examples{
-expect_no_duplicates(mtcars, "wt")
 expect_no_duplicates(mtcars, "cyl")
+# [1] "top duplicates..."
+# A tibble: 3 x 2
+# Groups:   cyl [3]
+#cyl     n
+#<dbl> <int>
+#1     4    11
+#2     6     7
+#3     8    14
+# Error in ifelse(stop_if_surprise, stop(paste0("Duplicates detected in column: ",  :
+                                                Duplicates detected in column: cyl
+
+expect_no_duplicates(rownames(mtcars))
+# [1] "no vector duplicates...OK"
 }

@@ -1,16 +1,35 @@
 
 
 ### model training functions ------
+
+#' Buids a variable profile plot with optional cutoffs at a vector that differentiated categorical mappings
+#'
+#' @param x predictor variable
+#' @param y response variable
+#' @param xlabel what to call your predictor
+#' @param ylabel what to call your response
+#' @param cutoffs an optional vector of cut points where a numeric variable becomes a continuous variable
+#'
+#' @return ggplot2 object
+#' @export
+#' @importFrom dplyr summarise
+#' @importFrom dplyr group_by
+#' @importFrom dplyr left_join
+#' @import ggplot2
+#'
+#' @examples
+#' plot_predict_var(mtcars$wt, mtcars$mpg, "weight", "miles per gallon")
+#' plot_predict_var(mtcars$hp, mtcars$mpg, "horsepower", "miles per gallon", cutoffs = c(80, 135, 200))
 plot_predict_var <- function(x, y, xlabel = "x", ylabel = "y", cutoffs = NA){
   ## see response by average predictor ##
   df <- data.frame(x = x, y = y)
   y_1 <-  summarise(group_by(df, x), mean(y))
   y_2 <- summarise(group_by(df, x), n())
-  y_1 <- y_1 %>% left_join(y_2)
+  y_1 <- left_join(y_1, y_2)
   p <- ggplot(y_1, aes(x, y = `mean(y)`, size = `n()`)) +
     geom_point(shape = 1) +
     geom_smooth(method = "loess")
-  if(!is.na(cutoffs)){
+  if(sum(!is.na(cutoffs) > 0)){
     p + geom_vline(xintercept = cutoffs, linetype = "3313") +
       labs(title = "Variable Profile: Average Response (y) by Predictor (x) \nCategory Groups Shown with Vertical Lines", x = xlabel, y = ylabel)
   } else if(is.na(cutoffs)){
