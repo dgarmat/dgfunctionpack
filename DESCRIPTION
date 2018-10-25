@@ -3,9 +3,12 @@ Type: Package
 Title: Key Functions I Use Often
 Version: 0.1.0
 Authors@R: person("Dan", "Garmat", email = "dgarmat@gmail.com", role = c("aut", "cre"))
-Description: This package stores various functions from myriad workflows I want to preserve.
-    These functions should eventually go into separate packages, but I want to have them in one place for now.
-License: MIT
+Description: This package stores various functions from workflows I reuse.
+    These functions should eventually go into separate packages, but I want
+    to have them in one place for now. Currently there are data assumption
+    checking functions for pipelines, modelling functions for common tasks
+    when modelling, and a handy clustering function.
+License: MIT + file LICENSE
 URL: https://github.com/dgarmat
 BugReports: https://github.com/dgarmat
 Encoding: UTF-8

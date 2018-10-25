@@ -5,14 +5,14 @@
 \title{Check if a dataframe has the same number of rows as another, or else 0 rows. If vectors are given the lengths of the vectors are compared.}
 \usage{
 expect_same_number_of_rows(df1, df2 = data.frame(),
-  stop_if_surprise = TRUE, report_rowcount = FALSE)
+  stop_if_fail = TRUE, report_rowcount = FALSE)
 }
 \arguments{
 \item{df1}{dataframe or vector to check (required)}
 
 \item{df2}{optional second dataframe or vector to compare (if not given, defaults to zero row data frame)}
 
-\item{stop_if_surprise}{T/F for whether to consider failure an error}
+\item{stop_if_fail}{T/F for whether to consider failure an error}
 
 \item{report_rowcount}{T/F for whether to return the number of rows}
 }
@@ -27,10 +27,10 @@ expect_same_number_of_rows(mtcars, mtcars)
 # [1] "Same number of rows...OK"
 
 expect_same_number_of_rows(mtcars, iris)
-# Error in ifelse(stop_if_surprise, stop(paste0("Different number of rows: ",  :
+# Error in ifelse(stop_if_fail, stop(paste0("Different number of rows: ",  :
 #    Different number of rows: 32 vs: 150
 
 expect_same_number_of_rows(mtcars)
-# Error in ifelse(stop_if_surprise, stop(paste0("Different number of rows: ",  :
+# Error in ifelse(stop_if_fail, stop(paste0("Different number of rows: ",  :
 #    Different number of rows: 32 vs: 0
 }

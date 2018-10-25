@@ -4,7 +4,7 @@
 \alias{expect_no_duplicates}
 \title{Check if a data frame has duplicates in a given column. If a vector is given, check for duplicates in the vector.}
 \usage{
-expect_no_duplicates(df, group_by_column, stop_if_surprise = TRUE,
+expect_no_duplicates(df, group_by_column, stop_if_fail = TRUE,
   report_duplicates = TRUE)
 }
 \arguments{
@@ -12,7 +12,7 @@ expect_no_duplicates(df, group_by_column, stop_if_surprise = TRUE,
 
 \item{group_by_column}{character vector name of column expecting no duplicates}
 
-\item{stop_if_surprise}{T/F for whether to consider failure an error}
+\item{stop_if_fail}{T/F for whether to consider failure an error}
 
 \item{report_duplicates}{T/F for whether to return a partial list of the top duplicates if failure}
 }
@@ -32,7 +32,7 @@ expect_no_duplicates(mtcars, "cyl")
 #1     4    11
 #2     6     7
 #3     8    14
-# Error in ifelse(stop_if_surprise, stop(paste0("Duplicates detected in column: ",  :
+# Error in ifelse(stop_if_fail, stop(paste0("Duplicates detected in column: ",  :
                                                 Duplicates detected in column: cyl
 
 expect_no_duplicates(rownames(mtcars))

@@ -25,5 +25,5 @@ Buids a variable profile plot with optional cutoffs at a vector that differentia
 }
 \examples{
 plot_predict_var(mtcars$wt, mtcars$mpg, "weight", "miles per gallon")
-plot_predict_var(mtcars$hp, mtcars$mpg, "horsepower", "miles per gallon", cutoffs = c(75, 135, 200))
+plot_predict_var(mtcars$hp, mtcars$mpg, "horsepower", "miles per gallon", cutoffs = c(80, 135, 200))
 }
