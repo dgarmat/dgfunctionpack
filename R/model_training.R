@@ -38,9 +38,20 @@ plot_predict_var <- function(x, y, xlabel = "x", ylabel = "y", cutoffs = NA){
 }
 
 
-coefs_to_points <- function(){
+#' Map a set of elastic net logistic regression coeficients 1-1 to points where 100 is the chosen threshold
+#'
+#' @param objModel an elastic net logistic model fit using caret
+#' @param thresholdStrat the percentage probability to cut off as positive
+#' @param pointsStrat the threshold in points to map the cut off to
+#'
+#' @return
+#' @export
+#' @importFrom dplyr data_frame
+#'
+#' @examples
+coefs_to_points <- function(objModel, thresholdStrat = 0.40, pointsStrat = 100){
   divisorStrat <- -log((1 / thresholdStrat) - 1) - coef(objModel$finalModel, objModel$bestTune$lambda)[1] # this is the GLM standard
-  constantMultiple <- 100 / divisorStrat
+  constantMultiple <- pointsStrat / divisorStrat
 
   # round(coef(objModel$finalModel, objModel$bestTune$lambda) * constantMultiple, 0)[-1,]
 
@@ -55,7 +66,18 @@ coefs_to_points <- function(){
 
 
 
-translate_coefs_to_points <- function(model_coef, thresholdStrat = 0.40){
+#' Map a generic logisitc model's coeficients 1-1 to points where 100 is stratification, handling relevelling of factors
+#'
+#' @param model_coef 
+#' @param thresholdStrat 
+#' @param pointsStrat 
+#'
+#' @return
+#' @export
+#' @importFrom dplyr data_frame
+#'
+#' @examples
+translate_coefs_to_points <- function(model_coef, thresholdStrat = 0.40, pointsStrat = 100){
   # handle other kinds of inputs
   if(sum(class(model_coef) %in% "glm") > 0){
     model_coef <- coef(summary(model_coef))
@@ -76,7 +98,7 @@ translate_coefs_to_points <- function(model_coef, thresholdStrat = 0.40){
     warning(paste0("your coeficient multiplier is negative, you need to set a higher thresholdStrat than ", thresholdStrat))
   }
   divisorStrat <- -log((1 / thresholdStrat) - 1) - min(model_coef[1], 0) # this attempts to handle positive intercepts
-  constantMultiple <- 100 / divisorStrat
+  constantMultiple <- pointsStrat / divisorStrat
 
   # round(coef(objModel$finalModel, objModel$bestTune$lambda) * constantMultiple, 0)[-1,]
 
@@ -89,9 +111,23 @@ translate_coefs_to_points <- function(model_coef, thresholdStrat = 0.40){
 }
 
 
-train_model <- function(x = model_input, vars = input_vars, resp = "response_label", cont = objControl, thresholdStrat = 0.40){
+#' Train a ridge regression on a set of variables and thranslate coeficients into points
+#'
+#' @param x 
+#' @param vars 
+#' @param resp 
+#' @param cont 
+#' @param thresholdStrat 
+#'
+#' @return
+#' @export
+#' @importFrom caret train
+#'
+#' @examples
+train_model <- function(x = model_input, vars = input_vars, resp = "response_label", cont = objControl, 
+                        thresholdStrat = 0.40, pointsStrat = 100){
   objModel <- train(x[, vars], x[, resp], method='glmnet', metric = "ROC",
-                    # set alpha = 0 for ridge regression, since already ran selection to find significant variables
+                    # set alpha = 0 for ridge regression since already ran selection to find significant variables
                     tuneGrid = expand.grid(alpha = 0, lambda = seq(0.001, 0.5, by = 0.001)),
                     trControl = cont)
   # evaluate the model
@@ -100,11 +136,27 @@ train_model <- function(x = model_input, vars = input_vars, resp = "response_lab
   # coef(objModel$finalModel, objModel$bestTune$lambda)
 
   OutputVars <- translate_coefs_to_points(model_coef = coef(objModel$finalModel, objModel$bestTune$lambda),
-                                          thresholdStrat = thresholdStrat)
+                                          thresholdStrat = thresholdStrat,
+                                          pointsStrat = pointsStrat)
   OutputVars
 }
 
 
+#' Take a dataframe and a set of variables and fit three logitic regressions using forward selection
+#'
+#' @param datfr 
+#' @param resp_var 
+#' @param pred_vars 
+#' @param int_var 
+#' @param run_forward_selection 
+#' @param trace_fs 
+#' @param steps_fs 
+#'
+#' @return
+#' @export
+#' @importFrom MASS stepAIC
+#'
+#' @examples
 create_int_lms <- function(datfr, resp_var = "response", pred_vars = NA, int_var = NA,
                            run_forward_selection = FALSE, trace_fs = FALSE, steps_fs = 5){
   # takes a dataframe and a set of variables and fits three logistics regressions,

@@ -2,7 +2,7 @@
 % Please edit documentation in R/data_expectations.R
 \name{expect_no_nas}
 \alias{expect_no_nas}
-\title{Check if there are any NA values in a data frame, or specified column, withon a tolerance}
+\title{Check if there are any NA values in a data frame, or specified column, within a tolerance}
 \usage{
 expect_no_nas(df, test_column = NA, na_tolerance = 0)
 }
@@ -12,7 +12,7 @@ expect_no_nas(df, test_column = NA, na_tolerance = 0)
 \item{na_tolerance}{number of NA allowed before failure, default is zero}
 }
 \description{
-Check if there are any NA values in a data frame, or specified column, withon a tolerance
+Check if there are any NA values in a data frame, or specified column, within a tolerance
 }
 \examples{
 expect_no_nas(mtcars, "cyl")

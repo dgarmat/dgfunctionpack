@@ -7,7 +7,7 @@
 #'
 #' @param df data frame to check
 #' @param group_by_column character vector name of column expecting no duplicates
-#' @param stop_if_surprise T/F for whether to consider failure an error
+#' @param stop_if_fail T/F for whether to consider failure an error
 #' @param report_duplicates T/F for whether to return a partial list of the top duplicates if failure
 #'
 #' @return several options depending on whether it fails or succeeeds
@@ -26,12 +26,12 @@
 #' #1     4    11
 #' #2     6     7
 #' #3     8    14
-#' # Error in ifelse(stop_if_surprise, stop(paste0("Duplicates detected in column: ",  :
+#' # Error in ifelse(stop_if_fail, stop(paste0("Duplicates detected in column: ",  :
 #'                                                 Duplicates detected in column: cyl
 #'
 #' expect_no_duplicates(rownames(mtcars))
 #' # [1] "no vector duplicates...OK"
-expect_no_duplicates <- function(df, group_by_column, stop_if_surprise = TRUE, report_duplicates = TRUE){
+expect_no_duplicates <- function(df, group_by_column, stop_if_fail = TRUE, report_duplicates = TRUE){
   if (!("data.frame" %in% class(df)) & is.vector(df)){
     df <- data.frame("vector" = df)
     group_by_column <- "vector"
@@ -54,7 +54,7 @@ expect_no_duplicates <- function(df, group_by_column, stop_if_surprise = TRUE, r
       print("top duplicates...")
       print(df)
     }
-    ifelse(stop_if_surprise,
+    ifelse(stop_if_fail,
            stop(paste0("Duplicates detected in column: ", group_by_column)),
            warning(paste0("Duplicates detected in column: ", group_by_column)))
   }
@@ -65,7 +65,7 @@ expect_no_duplicates <- function(df, group_by_column, stop_if_surprise = TRUE, r
 #'
 #' @param df1 dataframe or vector to check (required)
 #' @param df2 optional second dataframe or vector to compare (if not given, defaults to zero row data frame)
-#' @param stop_if_surprise T/F for whether to consider failure an error
+#' @param stop_if_fail T/F for whether to consider failure an error
 #' @param report_rowcount T/F for whether to return the number of rows
 #'
 #' @return several options depending on whether it fails or succeeeds
@@ -76,13 +76,13 @@ expect_no_duplicates <- function(df, group_by_column, stop_if_surprise = TRUE, r
 #' # [1] "Same number of rows...OK"
 #'
 #' expect_same_number_of_rows(mtcars, iris)
-#' # Error in ifelse(stop_if_surprise, stop(paste0("Different number of rows: ",  :
+#' # Error in ifelse(stop_if_fail, stop(paste0("Different number of rows: ",  :
 #' #    Different number of rows: 32 vs: 150
 #'
 #' expect_same_number_of_rows(mtcars)
-#' # Error in ifelse(stop_if_surprise, stop(paste0("Different number of rows: ",  :
+#' # Error in ifelse(stop_if_fail, stop(paste0("Different number of rows: ",  :
 #' #    Different number of rows: 32 vs: 0
-expect_same_number_of_rows <- function(df1, df2 = data.frame(), stop_if_surprise = TRUE, report_rowcount = FALSE){
+expect_same_number_of_rows <- function(df1, df2 = data.frame(), stop_if_fail = TRUE, report_rowcount = FALSE){
   # df2 = data.frame() default means if df2 is not specified, it checks if df1 has zero rows
 
   # if df is a vector not a df, make it into a df
@@ -108,7 +108,7 @@ expect_same_number_of_rows <- function(df1, df2 = data.frame(), stop_if_surprise
       print(paste0("Same number of rows", ifelse(report_rowcount, paste0(": ", nrow(df1)), ""), "...OK"))
     }
   } else{
-    ifelse(stop_if_surprise,
+    ifelse(stop_if_fail,
            stop(paste0("Different number of rows: ", nrow(df1), " vs: ", nrow(df2))),
            warning(paste0("Different number of rows: ", nrow(df1), " vs: ", nrow(df2))))
   }
@@ -171,7 +171,7 @@ expect_values_only_in <- function(test_vector, correct_vector){
 }
 
 
-#' Check if there are any NA values in a data frame, or specified column, withon a tolerance
+#' Check if there are any NA values in a data frame, or specified column, within a tolerance
 #'
 #' @param df
 #' @param test_column character string for column to test - optional
