@@ -207,4 +207,38 @@ expect_no_nas <- function(df, test_column = NA, na_tolerance = 0){
 
 
 
+#' Check if a set of columns are dates. Useful for debugging PowerBI R scripts with dates.
+#'
+#' @param df
+#' @param cols character vector of columns names to check if dates
+#' @param stop_if_fail T/F for whether to consider failure an error
+#'
+#' @return
+#' @export
+#'
+#' @examples
+expect_date <- function(df, cols, stop_if_fail = TRUE){
+  if (!("data.frame" %in% class(df)) & is.vector(df)){
+    df <- data.frame("vector" = df)
+    cols <- "vector"
+  }
+
+  # if any not found, then return error
+  for(co in cols){
+    if (sum(colnames(df) %in% co) == 0) {
+      # -i: would like to return all the columns not found, not just the first
+      stop(paste0("No column named: ", co))
+    }
+  }
+
+  dfdates <- sapply(df[cols], function(x) is.Date(x))
+  if(sum(dfdates) == length(cols)){
+    print(paste0("all columns are dates...OK"))
+  } else if(sum(dfdates) < length(cols)){
+    ifelse(stop_if_fail,
+           stop(paste0("Column is not a date: ", names(which(!dfdates)))),
+           warning(paste0("Column is not a date: ", names(which(!dfdates)))))
+  }
+}
+
 
