@@ -4,10 +4,13 @@
 \alias{expect_column_names_somewhere_in_data_frame}
 \title{Check if the column names you expect to be in the df, are indeed in there}
 \usage{
-expect_column_names_somewhere_in_data_frame(df, colums_expected)
+expect_column_names_somewhere_in_data_frame(df, colums_expected,
+  return_df = FALSE)
 }
 \arguments{
 \item{colums_expected}{a character vector}
+
+\item{return_df}{T/F whether to end function with dataframe input (as in if a check in part of a pipe)}
 }
 \description{
 Check if the column names you expect to be in the df, are indeed in there

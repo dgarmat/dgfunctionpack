@@ -18,3 +18,6 @@ wssplot(df, nc = 15, seed = 1234, nstart = 1)
 \description{
 Clustering Screeplot to help determine k
 }
+\examples{
+wssplot(iris[1:4])
+}

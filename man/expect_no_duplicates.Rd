@@ -4,8 +4,8 @@
 \alias{expect_no_duplicates}
 \title{Check if a data frame has duplicates in a given column. If a vector is given, check for duplicates in the vector.}
 \usage{
-expect_no_duplicates(df, group_by_column, stop_if_fail = TRUE,
-  report_duplicates = TRUE)
+expect_no_duplicates(df, group_by_column = NA, stop_if_fail = TRUE,
+  report_duplicates = TRUE, return_df = FALSE)
 }
 \arguments{
 \item{df}{data frame to check}
@@ -15,6 +15,8 @@ expect_no_duplicates(df, group_by_column, stop_if_fail = TRUE,
 \item{stop_if_fail}{T/F for whether to consider failure an error}
 
 \item{report_duplicates}{T/F for whether to return a partial list of the top duplicates if failure}
+
+\item{return_df}{T/F whether to end function with dataframe input (as in if a check in part of a pipe)}
 }
 \value{
 several options depending on whether it fails or succeeeds

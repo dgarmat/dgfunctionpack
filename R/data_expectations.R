@@ -9,6 +9,7 @@
 #' @param group_by_column character vector name of column expecting no duplicates
 #' @param stop_if_fail T/F for whether to consider failure an error
 #' @param report_duplicates T/F for whether to return a partial list of the top duplicates if failure
+#' @param return_df T/F whether to end function with dataframe input (as in if a check in part of a pipe)
 #'
 #' @return several options depending on whether it fails or succeeeds
 #' @export
@@ -31,10 +32,24 @@
 #'
 #' expect_no_duplicates(rownames(mtcars))
 #' # [1] "no vector duplicates...OK"
-expect_no_duplicates <- function(df, group_by_column, stop_if_fail = TRUE, report_duplicates = TRUE){
+expect_no_duplicates <- function(df, group_by_column = NA, stop_if_fail = TRUE, report_duplicates = TRUE, return_df = FALSE){
+  if(return_df){
+    df_copy_for_later <- df
+  }
+
   if (!("data.frame" %in% class(df)) & is.vector(df)){
     df <- data.frame("vector" = df)
     group_by_column <- "vector"
+  }
+
+  # no test column given, assume testing all for duplicates
+  if (is.na(group_by_column)){
+    group_by_column <- names(df)
+  }
+
+  # if number given, resave as field name with that number
+  if (is.numeric(group_by_column)){
+    group_by_column <- names(df)[group_by_column]
   }
 
   if (sum(colnames(df) == as.name(group_by_column)) == 0) {
@@ -44,20 +59,28 @@ expect_no_duplicates <- function(df, group_by_column, stop_if_fail = TRUE, repor
     stop(paste0("Expected only one, but multiple columns named: ", group_by_column))
   }
 
-  df <- group_by_(df, as.name(group_by_column))
-  df <- count(df)
-  df <- filter(df, n > 1)
-  if(nrow(df) == 0){
-    print(paste0("no ", group_by_column, " duplicates...OK"))
-  } else if(nrow(df) > 0){
-    if(report_duplicates){
-      print("top duplicates...")
-      print(df)
+  for (column in group_by_column){
+    dft <- group_by_(df, as.name(column))
+    dft <- count(dft)
+    dft <- filter(dft, n > 1)
+    if(nrow(dft) == 0){
+      print(paste0("no ", column, " duplicates...OK"))
+    } else if(nrow(dft) > 0){
+      if(report_duplicates){
+        print("top duplicates...")
+        dft <- arrange(dft, desc(n))
+        print(dft)
+      }
+      ifelse(stop_if_fail,
+             stop(paste0("Duplicates detected in column: ", column)),
+             warning(paste0("Duplicates detected in column: ", column)))
     }
-    ifelse(stop_if_fail,
-           stop(paste0("Duplicates detected in column: ", group_by_column)),
-           warning(paste0("Duplicates detected in column: ", group_by_column)))
   }
+
+  if(return_df){
+    df_copy_for_later
+  }
+
 }
 
 
@@ -67,6 +90,7 @@ expect_no_duplicates <- function(df, group_by_column, stop_if_fail = TRUE, repor
 #' @param df2 optional second dataframe or vector to compare (if not given, defaults to zero row data frame)
 #' @param stop_if_fail T/F for whether to consider failure an error
 #' @param report_rowcount T/F for whether to return the number of rows
+#' @param return_df T/F whether to end function with dataframe 1 input (as in if a check in part of a pipe)
 #'
 #' @return several options depending on whether it fails or succeeeds
 #' @export
@@ -82,8 +106,11 @@ expect_no_duplicates <- function(df, group_by_column, stop_if_fail = TRUE, repor
 #' expect_same_number_of_rows(mtcars)
 #' # Error in ifelse(stop_if_fail, stop(paste0("Different number of rows: ",  :
 #' #    Different number of rows: 32 vs: 0
-expect_same_number_of_rows <- function(df1, df2 = data.frame(), stop_if_fail = TRUE, report_rowcount = FALSE){
+expect_same_number_of_rows <- function(df1, df2 = data.frame(), stop_if_fail = TRUE, report_rowcount = FALSE, return_df = FALSE){
   # df2 = data.frame() default means if df2 is not specified, it checks if df1 has zero rows
+  if(return_df){
+    df_copy_for_later <- df1
+  }
 
   # if df is a vector not a df, make it into a df
   if (!("data.frame" %in% class(df1)) & is.vector(df1)){
@@ -112,12 +139,17 @@ expect_same_number_of_rows <- function(df1, df2 = data.frame(), stop_if_fail = T
            stop(paste0("Different number of rows: ", nrow(df1), " vs: ", nrow(df2))),
            warning(paste0("Different number of rows: ", nrow(df1), " vs: ", nrow(df2))))
   }
+
+  if(return_df){
+    df_copy_for_later
+  }
 }
 
 #' Check if the column names you expect to be in the df, are indeed in there
 #'
 #' @param df
 #' @param colums_expected a character vector
+#' @param return_df T/F whether to end function with dataframe input (as in if a check in part of a pipe)
 #'
 #' @return
 #' @export
@@ -128,7 +160,11 @@ expect_same_number_of_rows <- function(df1, df2 = data.frame(), stop_if_fail = T
 #' expect_column_names_somewhere_in_data_frame(mtcars, c("mpg", "cyl", "car_name"))
 #' # Error in expect_column_names_somewhere_in_data_frame(mtcars, c("mpg",  :
 #' #   car_name column not found
-expect_column_names_somewhere_in_data_frame <- function(df, colums_expected){
+expect_column_names_somewhere_in_data_frame <- function(df, colums_expected, return_df = FALSE){
+  if(return_df){
+    df_copy_for_later <- df
+  }
+
   if(sum(names(df) %in% colums_expected) == length(colums_expected)){
     print("all columns found...OK")
   } else{
@@ -136,6 +172,10 @@ expect_column_names_somewhere_in_data_frame <- function(df, colums_expected){
     stop(paste0(paste0(cols_not_found, collapse = ", "), " column",
                 ifelse(length(cols_not_found) > 1, "s", ""),
                 " not found"))
+  }
+
+  if(return_df){
+    df_copy_for_later
   }
 }
 
@@ -176,6 +216,7 @@ expect_values_only_in <- function(test_vector, correct_vector){
 #' @param df
 #' @param test_column character string for column to test - optional
 #' @param na_tolerance number of NA allowed before failure, default is zero
+#' @param return_df T/F whether to end function with dataframe input (as in if a check in part of a pipe)
 #'
 #' @return
 #' @export
@@ -190,7 +231,11 @@ expect_values_only_in <- function(test_vector, correct_vector){
 #' # [1] "Detected 0 NAs...OK"
 #' expect_no_nas(c(0, 3, NA, 5))
 #' # Error in expect_no_nas(c(0, 3, NA, 5)) : Detected 1 NAs
-expect_no_nas <- function(df, test_column = NA, na_tolerance = 0){
+expect_no_nas <- function(df, test_column = NA, na_tolerance = 0, return_df = FALSE){
+  if(return_df){
+    df_copy_for_later <- df
+  }
+
   if(!is.na(test_column)){
     # -i to handle multiple columns, need to iterate, maybe create or find a function that will make mult names
     df <- select_(df, as.name(test_column))
@@ -202,6 +247,10 @@ expect_no_nas <- function(df, test_column = NA, na_tolerance = 0){
   } else{
     print(paste0("Detected ", na_sum, " NAs...OK"))
   }
+
+  if(return_df){
+    df_copy_for_later
+  }
 }
 
 
@@ -212,12 +261,17 @@ expect_no_nas <- function(df, test_column = NA, na_tolerance = 0){
 #' @param df
 #' @param cols character vector of columns names to check if dates
 #' @param stop_if_fail T/F for whether to consider failure an error
+#' @param return_df T/F whether to end function with dataframe input (as in if a check in part of a pipe)
 #'
 #' @return
 #' @export
 #'
 #' @examples
-expect_date <- function(df, cols, stop_if_fail = TRUE){
+expect_date <- function(df, cols, stop_if_fail = TRUE, return_df = FALSE){
+  if(return_df){
+    df_copy_for_later <- df
+  }
+
   if (!("data.frame" %in% class(df)) & is.vector(df)){
     df <- data.frame("vector" = df)
     cols <- "vector"
@@ -238,6 +292,10 @@ expect_date <- function(df, cols, stop_if_fail = TRUE){
     ifelse(stop_if_fail,
            stop(paste0("Column is not a date: ", names(which(!dfdates)))),
            warning(paste0("Column is not a date: ", names(which(!dfdates)))))
+  }
+
+  if(return_df){
+    df_copy_for_later
   }
 }
 

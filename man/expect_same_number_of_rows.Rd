@@ -5,7 +5,7 @@
 \title{Check if a dataframe has the same number of rows as another, or else 0 rows. If vectors are given the lengths of the vectors are compared.}
 \usage{
 expect_same_number_of_rows(df1, df2 = data.frame(),
-  stop_if_fail = TRUE, report_rowcount = FALSE)
+  stop_if_fail = TRUE, report_rowcount = FALSE, return_df = FALSE)
 }
 \arguments{
 \item{df1}{dataframe or vector to check (required)}
@@ -15,6 +15,8 @@ expect_same_number_of_rows(df1, df2 = data.frame(),
 \item{stop_if_fail}{T/F for whether to consider failure an error}
 
 \item{report_rowcount}{T/F for whether to return the number of rows}
+
+\item{return_df}{T/F whether to end function with dataframe 1 input (as in if a check in part of a pipe)}
 }
 \value{
 several options depending on whether it fails or succeeeds

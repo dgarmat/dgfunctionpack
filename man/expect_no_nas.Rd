@@ -4,12 +4,15 @@
 \alias{expect_no_nas}
 \title{Check if there are any NA values in a data frame, or specified column, within a tolerance}
 \usage{
-expect_no_nas(df, test_column = NA, na_tolerance = 0)
+expect_no_nas(df, test_column = NA, na_tolerance = 0,
+  return_df = FALSE)
 }
 \arguments{
 \item{test_column}{character string for column to test - optional}
 
 \item{na_tolerance}{number of NA allowed before failure, default is zero}
+
+\item{return_df}{T/F whether to end function with dataframe input (as in if a check in part of a pipe)}
 }
 \description{
 Check if there are any NA values in a data frame, or specified column, within a tolerance
