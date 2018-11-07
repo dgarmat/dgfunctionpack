@@ -5,7 +5,7 @@
 \title{Check if the column names you expect to be in the df, are indeed in there}
 \usage{
 expect_column_names_somewhere_in_data_frame(df, colums_expected,
-  return_df = FALSE)
+  return_df = TRUE)
 }
 \arguments{
 \item{colums_expected}{a character vector}

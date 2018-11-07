@@ -32,7 +32,7 @@
 #'
 #' expect_no_duplicates(rownames(mtcars))
 #' # [1] "no vector duplicates...OK"
-expect_no_duplicates <- function(df, group_by_column = NA, stop_if_fail = TRUE, report_duplicates = TRUE, return_df = FALSE){
+expect_no_duplicates <- function(df, group_by_column = NA, stop_if_fail = TRUE, report_duplicates = TRUE, return_df = TRUE){
   if(return_df){
     df_copy_for_later <- df
   }
@@ -106,7 +106,7 @@ expect_no_duplicates <- function(df, group_by_column = NA, stop_if_fail = TRUE, 
 #' expect_same_number_of_rows(mtcars)
 #' # Error in ifelse(stop_if_fail, stop(paste0("Different number of rows: ",  :
 #' #    Different number of rows: 32 vs: 0
-expect_same_number_of_rows <- function(df1, df2 = data.frame(), stop_if_fail = TRUE, report_rowcount = FALSE, return_df = FALSE){
+expect_same_number_of_rows <- function(df1, df2 = data.frame(), stop_if_fail = TRUE, report_rowcount = FALSE, return_df = TRUE){
   # df2 = data.frame() default means if df2 is not specified, it checks if df1 has zero rows
   if(return_df){
     df_copy_for_later <- df1
@@ -160,7 +160,7 @@ expect_same_number_of_rows <- function(df1, df2 = data.frame(), stop_if_fail = T
 #' expect_column_names_somewhere_in_data_frame(mtcars, c("mpg", "cyl", "car_name"))
 #' # Error in expect_column_names_somewhere_in_data_frame(mtcars, c("mpg",  :
 #' #   car_name column not found
-expect_column_names_somewhere_in_data_frame <- function(df, colums_expected, return_df = FALSE){
+expect_column_names_somewhere_in_data_frame <- function(df, colums_expected, return_df = TRUE){
   if(return_df){
     df_copy_for_later <- df
   }
@@ -231,7 +231,7 @@ expect_values_only_in <- function(test_vector, correct_vector){
 #' # [1] "Detected 0 NAs...OK"
 #' expect_no_nas(c(0, 3, NA, 5))
 #' # Error in expect_no_nas(c(0, 3, NA, 5)) : Detected 1 NAs
-expect_no_nas <- function(df, test_column = NA, na_tolerance = 0, return_df = FALSE){
+expect_no_nas <- function(df, test_column = NA, na_tolerance = 0, return_df = TRUE){
   if(return_df){
     df_copy_for_later <- df
   }
@@ -267,7 +267,7 @@ expect_no_nas <- function(df, test_column = NA, na_tolerance = 0, return_df = FA
 #' @export
 #'
 #' @examples
-expect_date <- function(df, cols, stop_if_fail = TRUE, return_df = FALSE){
+expect_date <- function(df, cols, stop_if_fail = TRUE, return_df = TRUE){
   if(return_df){
     df_copy_for_later <- df
   }

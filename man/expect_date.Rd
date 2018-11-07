@@ -4,7 +4,7 @@
 \alias{expect_date}
 \title{Check if a set of columns are dates. Useful for debugging PowerBI R scripts with dates.}
 \usage{
-expect_date(df, cols, stop_if_fail = TRUE, return_df = FALSE)
+expect_date(df, cols, stop_if_fail = TRUE, return_df = TRUE)
 }
 \arguments{
 \item{cols}{character vector of columns names to check if dates}

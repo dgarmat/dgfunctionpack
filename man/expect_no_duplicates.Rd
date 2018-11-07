@@ -5,7 +5,7 @@
 \title{Check if a data frame has duplicates in a given column. If a vector is given, check for duplicates in the vector.}
 \usage{
 expect_no_duplicates(df, group_by_column = NA, stop_if_fail = TRUE,
-  report_duplicates = TRUE, return_df = FALSE)
+  report_duplicates = TRUE, return_df = TRUE)
 }
 \arguments{
 \item{df}{data frame to check}

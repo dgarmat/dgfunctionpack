@@ -5,7 +5,7 @@
 \title{Check if there are any NA values in a data frame, or specified column, within a tolerance}
 \usage{
 expect_no_nas(df, test_column = NA, na_tolerance = 0,
-  return_df = FALSE)
+  return_df = TRUE)
 }
 \arguments{
 \item{test_column}{character string for column to test - optional}
