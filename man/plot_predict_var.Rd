@@ -4,7 +4,9 @@
 \alias{plot_predict_var}
 \title{Buids a variable profile plot with optional cutoffs at a vector that differentiated categorical mappings}
 \usage{
-plot_predict_var(x, y, xlabel = "x", ylabel = "y", cutoffs = NA)
+plot_predict_var(df, x, y = NA, xlabel = "default",
+  ylabel = "default", cutoffs = NA, y_as_pct = FALSE,
+  y_accuracy = 1, x_name_exact = TRUE)
 }
 \arguments{
 \item{x}{predictor variable}
@@ -24,6 +26,6 @@ ggplot2 object
 Buids a variable profile plot with optional cutoffs at a vector that differentiated categorical mappings
 }
 \examples{
-plot_predict_var(mtcars$wt, mtcars$mpg, "weight", "miles per gallon")
-plot_predict_var(mtcars$hp, mtcars$mpg, "horsepower", "miles per gallon", cutoffs = c(80, 135, 200))
+plot_predict_var(mtcars, "wt", "mpg", "weight", "miles per gallon")
+plot_predict_var(mtcars, "hp", "mpg", "horsepower", "miles per gallon", cutoffs = c(80, 135, 200))
 }

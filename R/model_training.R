@@ -15,26 +15,93 @@
 #' @importFrom dplyr summarise
 #' @importFrom dplyr group_by
 #' @importFrom dplyr left_join
+#' @importFrom scales percent_format
+#' @importFrom purrr map_lgl
 #' @import ggplot2
 #'
 #' @examples
-#' plot_predict_var(mtcars$wt, mtcars$mpg, "weight", "miles per gallon")
-#' plot_predict_var(mtcars$hp, mtcars$mpg, "horsepower", "miles per gallon", cutoffs = c(80, 135, 200))
-plot_predict_var <- function(x, y, xlabel = "x", ylabel = "y", cutoffs = NA){
+#' plot_predict_var(mtcars, "wt", "mpg", "weight", "miles per gallon")
+#' plot_predict_var(mtcars, "hp", "mpg", "horsepower", "miles per gallon", cutoffs = c(80, 135, 200))
+plot_predict_var <- function(df, x, y = NA, xlabel = "default", ylabel = "default", cutoffs = NA, y_as_pct = FALSE, y_accuracy = 1, x_name_exact = TRUE){
   ## see response by average predictor ##
-  df <- data.frame(x = x, y = y)
-  y_1 <-  summarise(group_by(df, x), mean(y))
-  y_2 <- summarise(group_by(df, x), n())
-  y_1 <- left_join(y_1, y_2)
-  p <- ggplot(y_1, aes(x, y = `mean(y)`, size = `n()`)) +
-    geom_point(shape = 1) +
-    geom_smooth(method = "loess")
-  if(sum(!is.na(cutoffs) > 0)){
-    p + geom_vline(xintercept = cutoffs, linetype = "3313") +
-      labs(title = "Variable Profile: Average Response (y) by Predictor (x) \nCategory Groups Shown with Vertical Lines", x = xlabel, y = ylabel)
-  } else if(is.na(cutoffs)){
-    p + labs(title = "Variable Profile: Average Response (y) by Predictor (x)", x = xlabel, y = ylabel)
+  
+  # handle backward compatability
+  if((length(df) > 1) & (length(x) > 1)){
+    warning("attempting backward compatibility, prefer start with df")
+    # reset the vars
+    if((is.numeric(ylabel)) & (is.na(cutoffs))) {
+      cutoffs <- ylabel
+    }
+    if(xlabel == "default"){
+      ylabel <- "y"
+    } else{
+      ylabel <- xlabel
+    }    
+    if(is.na(y)){
+      xlabel <- "x"
+    } else{
+      xlabel <- y
+    }
+    y <- x
+    x <- df
+    df <- data.frame(x = x, y = y)
+    
+    y_1 <-  summarise(group_by(df, x), mean(y), n())
+    p <- ggplot(y_1, aes(x, y = `mean(y)`, size = `n()`)) +
+      geom_point(shape = 1) +
+      geom_smooth(method = "loess") +
+      theme(legend.position = "none")
+    
+  } else if(is.data.frame(df) & is.character(x) & is.character(y)){
+    if(!x_name_exact) {
+      # if no exact match
+      if(sum(colnames(df) %in% x) == 0){
+        # search for a match substring
+        x <- colnames(df)[map_lgl(colnames(df), grepl, x = x)][1]
+      }
+    }
+    df <- df[, c(y, x)]
+    y_1 <-  summarise_all(group_by_(df, x),  funs(mean, n()))
+    p <- ggplot(y_1, aes_string(
+      x = x, 
+      y = "mean", 
+      size = "n")) +
+      geom_point(shape = 1) +
+      geom_smooth(method = "loess") +
+      theme(legend.position = "none")
+    
+    # if df, default x is variable name now
+    if(xlabel == "default"){
+      xlabel <- x
+    }
+    if(ylabel == "default"){
+      ylabel <- y
+    }
+  } else{
+    stop("expecting data frame, x column name, and y column name")
   }
+
+  if(sum(!is.na(cutoffs) > 0)){
+    p <- p + geom_vline(xintercept = cutoffs, linetype = "3313") +
+      labs(title = paste0("Variable Profile: Average ",
+                          ylabel, " by ", 
+                          xlabel, 
+                          "\nCategory Groups Shown with Vertical Lines"), 
+           x = xlabel, 
+           y = ylabel) 
+  } else if(is.na(cutoffs)){
+    p <- p + labs(title = paste0("Variable Profile: Average ",
+                            ylabel, " by ", 
+                            xlabel), 
+             x = xlabel, 
+             y = ylabel)
+  }
+  
+  if(y_as_pct) {
+    p <- p + scale_y_continuous(labels = percent_format(accuracy = y_accuracy))
+  }
+  
+  p
 }
 
 
