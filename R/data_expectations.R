@@ -313,7 +313,7 @@ expect_date <- function(df, cols, stop_if_fail = TRUE, return_df = TRUE){
 #'
 #' @examples
 #' wc(mtcars)
-#' mtcars %>% wc()
+#' mtcars %>% filter(cyl == 4) %>% wc()
 wc <- function(df, n = NA, open = TRUE, del = TRUE, del_wait = 10){
   # by default, add a timestamp to current temp.csv file
   if(is.na(n)){

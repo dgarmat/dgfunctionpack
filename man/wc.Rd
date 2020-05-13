@@ -20,5 +20,5 @@ Write a data frame to a temporary .csv and open in Excel
 }
 \examples{
 wc(mtcars)
-mtcars \%>\% wc()
+mtcars \%>\% filter(cyl == 4) \%>\% wc()
 }
