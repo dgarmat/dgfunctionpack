@@ -300,3 +300,45 @@ expect_date <- function(df, cols, stop_if_fail = TRUE, return_df = TRUE){
 }
 
 
+#' Write a data frame to a temporary .csv and open in Excel
+#'
+#' @param df
+#' @param n suffix for temporary csv file name, defaults to Sys.time()
+#' @param open T/F for whether to auto-open in Excel
+#' @param del T/F whether to deleted the created file
+#' @param del_wait how many seconds to wait to delete the file
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' wc(mtcars)
+#' mtcars %>% wc()
+wc <- function(df, n = NA, open = TRUE, del = TRUE, del_wait = 10){
+  # by default, add a timestamp to current temp.csv file
+  if(is.na(n)){
+    n <- gsub(":| ", "_", Sys.time())
+  } else if(n == ""){
+    n <- ""
+  } else if(n == "+1" | n == -1 | n == 0){
+    temp_files <- list.files()[grepl(pattern = "temp[0-9]*\\.csv", list.files())]
+    nm1 <- max(as.numeric(
+      gsub(".csv", "", gsub("temp", "", temp_files))), 
+      na.rm = T)
+    if(nm1 == -Inf){
+      n <- 1
+    } else {
+      n <- nm1 + 1
+    }
+  }
+  readr::write_csv(df, paste0("temp", n, ".csv"))
+  
+  if(open){
+    system(paste0("open ",(paste0("temp", n, ".csv"))))
+  }
+  
+  if(del){
+    Sys.sleep(del_wait)
+    file.remove(paste0("temp", n, ".csv"))
+  }
+}
